@@ -1,0 +1,7 @@
+{
+    "singleQuote": true,
+    "semi": true,
+    "jsxSingleQuote": true,
+    "useTabs": true,
+    "bracketSpacing": true
+}
