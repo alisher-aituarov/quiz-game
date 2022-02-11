@@ -2,25 +2,56 @@ import { protect } from '../middleware/auth';
 import { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { verifyAdmin } from '../middleware/verifyAdmin';
 
 const express = require('express');
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
+router.get('/', async (req: Request, res: Response) => {
+	try {
+		const data = await prisma.difficulty.findMany({
+			orderBy: [
+				{
+					name: 'asc',
+				},
+			],
+		});
+		res.json({
+			data: data,
+		});
+	} catch (e) {
+		res.status(500).send(e.message);
+	}
+});
+
+router.delete('/:id', protect, async (req: Request, res: Response) => {
+	const { id } = req.params;
+	try {
+		const response = await prisma.difficulty.delete({
+			where: {
+				id: Number(id),
+			},
+		});
+		res.json({
+			success: true,
+			message: 'Successfully deleted',
+		});
+	} catch (e) {
+		res.status(500).send(e.message);
+	}
+});
+
 router.post(
 	'/',
 	protect,
+	verifyAdmin,
 	body('name').isLength({ min: 4, max: 100 }),
-	async (req: Request & { user:  }, res: Response) => {
+	async (req: Request, res: Response) => {
 		const { body } = req;
 		try {
-			if (req.user.role !== 'ADMIN') {
-				return res.status(403).send({
-					success: false,
-					error: 'Access denied',
-				});
-			}
 			const errors = validationResult(req);
 			if (!errors.isEmpty()) {
 				return res.status(400).send({
@@ -34,13 +65,10 @@ router.post(
 				},
 			});
 			return res.json({
-				message: 'Difficulty created',
+				message: 'Successfully created',
 			});
 		} catch (e) {
-			return res.status(500).send({
-				success: false,
-				error: e.message,
-			});
+			return res.status(500).send(e.message);
 		}
 	}
 );
