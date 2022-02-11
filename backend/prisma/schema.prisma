@@ -29,6 +29,13 @@ model Difficulty {
     @@map("difficulties")
 }
 
+model Genre {
+    id      Int     @id     @default(autoincrement())
+    name    String  @unique
+
+    @@map("genres")
+}
+
 enum Role {
   USER
   ADMIN
