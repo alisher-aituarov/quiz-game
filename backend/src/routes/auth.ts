@@ -45,7 +45,7 @@ router.post(
 
 			return res.json({
 				success: true,
-				message: 'User created',
+				message: 'Successfully created',
 			});
 		} catch (error) {
 			return res.status(500).send({

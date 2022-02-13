@@ -5,35 +5,71 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String
-  role     Role    @default(USER)
-  password String
-  score    Int     @default(0)
-  avatar   String?
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  name      String
+  role      Role       @default(USER)
+  password  String
+  score     Int        @default(0)
+  avatar    String?
+  questions Question[]
 
   @@map("users")
 }
 
 model Difficulty {
-    id      Int     @id     @default(autoincrement())
-    name    String  @unique
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  questions Question[]
 
-    @@map("difficulties")
+  @@map("difficulties")
 }
 
 model Genre {
-    id      Int     @id     @default(autoincrement())
-    name    String  @unique
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  questions Question[]
 
-    @@map("genres")
+  @@map("genres")
+}
+
+model Question {
+  id           Int         @id @default(autoincrement())
+  createdAt    DateTime    @default(now())
+  content      String
+  pointPrice   Int
+  active       Boolean     @default(false)
+  rating       Int         @default(0)
+  approved     Boolean     @default(false)
+  Owner        User?       @relation(fields: [ownerId], references: [id])
+  ownerId      Int?
+  Difficulty   Difficulty? @relation(fields: [difficultyId], references: [id])
+  difficultyId Int?
+  Genre        Genre?      @relation(fields: [genreId], references: [id])
+  genreId      Int?
+  answers      Answer[]
+
+  @@map("questions")
+}
+
+model Answer {
+  id         Int       @id @default(autoincrement())
+  content    String
+  correct    Boolean
+  Question   Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId Int?
+
+  @@map("answers")
 }
 
 enum Role {
