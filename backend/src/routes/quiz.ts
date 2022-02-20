@@ -112,7 +112,7 @@ router.get(
 			});
 			return res.json({
 				data: question,
-				done: quiz.questions.length - 1,
+				done: !!(quiz.questions.length - 1),
 			});
 		} catch (error) {
 			return res.status(500).json({
@@ -152,19 +152,46 @@ router.post(
 					startTime: 'desc',
 				},
 			});
+			if (!quiz.questions.includes(question.id)) {
+				return res.status(400).json({
+					error: 'Вы уже ответили на этот вопрос',
+				});
+			}
 			await prisma.quiz.update({
 				where: {
 					id: quiz.id,
 				},
 				data: {
-					questions: quiz.questions.pop(),
+					questions: quiz.questions.slice(0, -1),
 					points: correctlyAnswered
 						? quiz.points + question.pointPrice
 						: quiz.points - question.pointPrice,
 				},
 			});
-			if (correctAnswerID === userAnswerID) {
-			}
+			return res.json({
+				data: question.answers,
+			});
+		} catch (error) {
+			res.status(500).json({
+				error: error.message,
+			});
+		}
+	}
+);
+
+router.post(
+	'/finish',
+	protect,
+	async (req: Request & { user: { id: number } }, res: Response) => {
+		try {
+			const quiz = await prisma.quiz.findFirst({
+				where: {
+					userId: req.user.id,
+				},
+				orderBy: {
+					startTime: 'desc',
+				},
+			});
 		} catch (error) {}
 	}
 );
