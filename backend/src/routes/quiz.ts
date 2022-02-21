@@ -76,7 +76,7 @@ router.get(
 				},
 			});
 			if (!quiz.questions.length) {
-				return res.json({
+				return res.status(404).json({
 					message: 'You have finished quiz!',
 				});
 			}
@@ -154,7 +154,7 @@ router.post(
 			});
 			if (!quiz.questions.includes(question.id)) {
 				return res.status(400).json({
-					error: 'Вы уже ответили на этот вопрос',
+					error: 'You have already answered to that question',
 				});
 			}
 			await prisma.quiz.update({
@@ -192,7 +192,30 @@ router.post(
 					startTime: 'desc',
 				},
 			});
-		} catch (error) {}
+			if (!quiz || quiz?.endTime) {
+				return res.status(404).json({
+					error: 'No active quiz found',
+				});
+			}
+			const updatedQuiz = await prisma.quiz.update({
+				where: {
+					id: quiz.id,
+				},
+				data: {
+					endTime: new Date(),
+				},
+			});
+			return res.json({
+				data: {
+					points: updatedQuiz.points,
+					endTime: updatedQuiz.endTime,
+				},
+			});
+		} catch (error) {
+			return res.status(500).json({
+				error: error.message,
+			});
+		}
 	}
 );
 
