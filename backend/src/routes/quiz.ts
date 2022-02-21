@@ -182,7 +182,10 @@ router.post(
 router.post(
 	'/finish',
 	protect,
-	async (req: Request & { user: { id: number } }, res: Response) => {
+	async (
+		req: Request & { user: { id: number; score: number } },
+		res: Response
+	) => {
 		try {
 			const quiz = await prisma.quiz.findFirst({
 				where: {
@@ -203,6 +206,14 @@ router.post(
 				},
 				data: {
 					endTime: new Date(),
+				},
+			});
+			await prisma.user.update({
+				where: {
+					id: req.user.id,
+				},
+				data: {
+					score: req.user.score + updatedQuiz.points,
 				},
 			});
 			return res.json({
