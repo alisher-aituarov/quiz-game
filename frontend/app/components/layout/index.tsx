@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container } from "../container";
 import { NavbarComponent } from "../modules/navbar";
 
 export const Layout: FC = ({ children }) => {
