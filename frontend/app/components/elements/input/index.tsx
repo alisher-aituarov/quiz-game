@@ -8,7 +8,7 @@ export const Input: FC<Props> = ({ placeholder, value, onChange, className }) =>
         <label className="flex">
             <input
                 className={classNames(
-                    'flex-auto bg-pink-200 py-2 px-3 rounded-md outline-none focus:shadow-lg hover:shadow-sm placeholder:text-red-400 transition-shadow text-red-900',
+                    'flex-auto bg-gray-100 py-4 px-5 rounded-sm outline-none focus:shadow-lg hover:shadow-sm placeholder:text-gray-400 transition-shadow text-red-900',
                     className,
                 )}
                 placeholder={placeholder}
