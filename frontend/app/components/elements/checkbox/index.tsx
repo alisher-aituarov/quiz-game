@@ -1,9 +1,7 @@
 import { ChangeEvent, FC } from 'react';
 
-interface Props {
+interface Props extends React.ComponentProps<'input'> {
     label: string;
-    checked: boolean;
-    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const Checkbox: FC<Props> = ({ onChange, label, checked }) => {
