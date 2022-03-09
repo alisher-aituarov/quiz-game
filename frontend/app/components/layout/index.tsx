@@ -1,11 +1,16 @@
+import classNames from 'classnames';
 import { FC } from 'react';
 import { Container } from '../container';
 import { Bottom } from '../modules/bottom';
 import { Navbar } from '../modules/navbar';
 
-export const Layout: FC = ({ children }) => {
+interface Props {
+    className: string;
+}
+
+export const Layout: FC<Props> = ({ children, className }) => {
     return (
-        <div className="h-full flex flex-col w-100">
+        <div className={classNames('h-full flex flex-col w-100', className)}>
             <Navbar />
             <Container>{children}</Container>
             <Bottom />

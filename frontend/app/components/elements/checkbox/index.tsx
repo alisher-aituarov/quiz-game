@@ -1,13 +1,13 @@
 import { ChangeEvent, FC } from 'react';
 
 interface Props extends React.ComponentProps<'input'> {
-    label: string;
+    label?: string;
 }
 
 export const Checkbox: FC<Props> = ({ onChange, label, checked }) => {
     return (
-        <div className="mt-1">
-            <label className="inline-flex items-center mt-3">
+        <div className="my-1">
+            <label className="inline-flex items-center">
                 <input
                     type="checkbox"
                     onChange={onChange}
