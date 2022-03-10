@@ -5,7 +5,7 @@ import { Bottom } from '../modules/bottom';
 import { Navbar } from '../modules/navbar';
 
 interface Props {
-    className: string;
+    className?: string;
 }
 
 export const Layout: FC<Props> = ({ children, className }) => {

@@ -5,6 +5,7 @@ import classNames from 'classnames';
 interface Props {
     label: string;
     options: TOption[];
+    primary?: boolean;
 }
 
 export type TOption = {
@@ -12,14 +13,20 @@ export type TOption = {
     value: number;
 };
 
-export const Dropdown: FC<Props> = ({ label, options }) => {
+export const Dropdown: FC<Props> = ({ label, options, primary }) => {
     return (
-        <Menu as="div" className="relative inline-block text-left">
-            <div>
-                <Menu.Button className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500">
-                    {label}
-                </Menu.Button>
-            </div>
+        <Menu as="div" className={classNames('relative inline-block text-left', { 'w-full h-full': primary })}>
+            <Menu.Button
+                className={classNames(
+                    'inline-flex justify-center items-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500',
+                    {
+                        'h-full bg-gray-100 border-none rounded-sm outline-none focus:shadow-lg hover:shadow-sm text-gray-400 transition-shadow focus:ring-offset-0 focus:ring-0':
+                            primary,
+                    },
+                )}
+            >
+                {label}
+            </Menu.Button>
 
             <Transition
                 as={Fragment}
@@ -46,6 +53,11 @@ export const Dropdown: FC<Props> = ({ label, options }) => {
                                 )}
                             </Menu.Item>
                         ))}
+                        {!options?.length && (
+                            <Menu.Item>
+                                <span className={classNames('block px-4 py-2 text-sm')}>Empty</span>
+                            </Menu.Item>
+                        )}
                     </div>
                 </Menu.Items>
             </Transition>
