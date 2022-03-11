@@ -1,4 +1,5 @@
-import { ReactElement, useMemo } from 'react';
+import { ReactElement, useEffect, useMemo } from 'react';
+import { questionService } from '../app/api/quesstionService';
 import { Button } from '../app/components/elements/button';
 import { Dropdown } from '../app/components/elements/dropdown';
 import { RatingCard } from '../app/components/elements/rating-card';
@@ -17,6 +18,13 @@ const HomePage: NextPageWithLayout = () => {
                 .map((k) => ({ value: k })),
         [],
     );
+    useEffect(() => {
+        const run = async () => {
+            const data = await questionService.read();
+            console.log(data);
+        };
+        run();
+    }, []);
 
     return (
         <div className="flex gap-5 flex-col md:flex-row">

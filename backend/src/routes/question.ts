@@ -1,5 +1,5 @@
 import { protect } from '../middleware/auth';
-import { Request, Response } from 'express';
+import e, { Request, Response } from 'express';
 import { body, validationResult, checkSchema, check } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
 import { Prisma } from '@prisma/client';
@@ -9,6 +9,26 @@ const express = require('express');
 
 const router = express.Router();
 const prisma = new PrismaClient();
+
+router.get(
+	'/',
+	async (
+		req: Request & { user: { id: number; role: 'ADMIN' | 'USER' } },
+		res: Response
+	) => {
+		try {
+			const data = await prisma.question.findMany();
+			return res.json({
+				data: data,
+			});
+		} catch (e) {
+			return res.status(500).json({
+				success: false,
+				error: e.message,
+			});
+		}
+	}
+);
 
 router.post(
 	'/',
