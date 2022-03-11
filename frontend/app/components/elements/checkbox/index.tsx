@@ -6,7 +6,7 @@ interface Props extends React.ComponentProps<'input'> {
 
 export const Checkbox: FC<Props> = ({ onChange, label, checked }) => {
     return (
-        <div className="my-1">
+        <div className="my-1 flex items-center">
             <label className="inline-flex items-center">
                 <input
                     type="checkbox"
