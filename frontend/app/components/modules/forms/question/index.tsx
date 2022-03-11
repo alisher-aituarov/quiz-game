@@ -16,9 +16,9 @@ export const QuestionForm: FC = () => {
     };
 
     return (
-        <div className="mt-10 sm:mt-0">
-            <div className="md:grid md:grid-cols-3 md:gap-6">
-                <div className="mt-5 md:mt-0 md:col-span-2">
+        <div className="mt-3 sm:mt-0 py-4">
+            <div className="md:grid md:grid-cols-5 md:gap-6 md:justify-items-center">
+                <div className="mt-1 md:mt-0 md:col-start-2 md:col-span-3">
                     <form action="#" method="POST">
                         <div className="shadow overflow-hidden sm:rounded-md">
                             <div className="px-4 py-5 bg-white sm:p-6">
@@ -26,7 +26,6 @@ export const QuestionForm: FC = () => {
                                     <div className="col-span-12 sm:col-span-6">
                                         <Textarea placeholder="" />
                                     </div>
-
                                     <div className="col-span-6 sm:col-span-2">
                                         <Input placeholder="Points" />
                                     </div>
