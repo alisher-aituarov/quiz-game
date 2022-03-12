@@ -5,7 +5,7 @@ interface Props extends React.ComponentProps<'button'> {
     loading?: boolean;
 }
 
-export const Button: FC<Props> = ({ children, className, type = 'button', onClick, loading }) => {
+export const Button: FC<Props> = ({ children, className, type = 'button', onClick, loading, disabled }) => {
     return (
         <button
             className={classNames(
@@ -13,9 +13,10 @@ export const Button: FC<Props> = ({ children, className, type = 'button', onClic
                 { 'hover:shadow-lg': !loading },
                 { 'before:hidden': !loading },
                 { 'before:animate-[slide_1s_ease-in-out_infinite]': loading },
+                { 'bg-gray-400 pointer-events-none': disabled },
                 className,
             )}
-            onClick={onClick}
+            onClick={!disabled ? onClick : () => null}
             type={type}
         >
             {children}

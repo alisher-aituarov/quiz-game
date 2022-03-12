@@ -1,17 +1,17 @@
+import { AxiosResponse } from 'axios';
 import { httpClient } from './httpClient';
 
 export class ApiService {
-    entity: string;
+    entity;
 
     constructor(entity: string) {
         this.entity = entity;
     }
 
-    protected get() {
-        return httpClient.get(this.entity);
+    protected get<R>(uri = '') {
+        return httpClient.get(this.entity + uri);
     }
-    protected post<T>(uri: string, body: T) {
-        console.log(body);
+    protected post<R, B = undefined>(uri: string, body?: B) {
         return httpClient.post(this.entity + uri, body);
     }
     protected put() {}

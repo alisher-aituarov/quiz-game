@@ -12,6 +12,7 @@ export const Checkbox: FC<Props> = ({ onChange, label, checked }) => {
                     type="checkbox"
                     onChange={onChange}
                     className="form-checkbox h-7 w-7 text-green-600 rounded-md"
+                    defaultChecked={false}
                     checked={checked}
                 />
                 <span className="ml-2 text-gray-700">{label}</span>

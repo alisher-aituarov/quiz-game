@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
+import { protect } from '../middleware/auth';
 import { SignInPayload, SignUpPayload } from '../types/User';
 import { generateToken } from '../utils/security';
 
@@ -62,6 +63,7 @@ router.post(
 	body('password').isString(),
 	async (req: Request & { body: SignInPayload }, res: Response) => {
 		const { email, password } = req.body;
+		console.log(email, password);
 		const user = await prisma.user.findUnique({
 			where: {
 				email: email,
@@ -69,7 +71,7 @@ router.post(
 		});
 		if (user && (await bcrypt.compare(password, user.password))) {
 			return res.json({
-				token: generateToken(user.id),
+				data: { token: generateToken(user.id) },
 			});
 		}
 		return res.status(401).send({
@@ -78,4 +80,34 @@ router.post(
 	}
 );
 
-export const authRouter = router;
+router.get(
+	'/me',
+	protect,
+	async (req: Request & { user: { id: number } }, res: Response) => {
+		try {
+			const user = await prisma.user.findUnique({
+				where: {
+					id: req.user.id,
+				},
+				select: {
+					id: true,
+					avatar: true,
+					email: true,
+					name: true,
+					role: true,
+					score: true,
+					quizs: true,
+				},
+			});
+			return res.json({
+				data: user,
+			});
+		} catch (error) {
+			return res.status(500).json({
+				error: error.message,
+			});
+		}
+	}
+);
+
+export const userRouter = router;

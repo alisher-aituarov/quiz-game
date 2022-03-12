@@ -1,24 +1,24 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { STORAGE_KEYS } from '../../constants/storage-keys';
 import { LoginPayload, RegisterPayload } from '../../types';
+import { LocalStorage } from '../../utils/local-storage';
 import { AuthState } from '../types';
 
 export const initialState: AuthState = {
-    userData: null,
-    authenticated: false,
+    authenticated: !!LocalStorage.get(STORAGE_KEYS.accessToken),
     error: '',
     loading: false,
 };
 
 const authSlice = createSlice({
-    name: 'user',
+    name: 'auth',
     initialState,
     reducers: {
         login: (state, { payload }: PayloadAction<LoginPayload>) => {
             state.loading = true;
             state.error = '';
         },
-        loginSuccess: (state, { payload }: PayloadAction<User>) => {
-            state.userData = payload;
+        loginSuccess: (state) => {
             state.authenticated = true;
             state.loading = false;
             state.error = '';

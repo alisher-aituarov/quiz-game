@@ -1,61 +1,32 @@
 import { ReactElement, useEffect, useMemo } from 'react';
-import { questionService } from '../app/api/quesstionService';
 import { Button } from '../app/components/elements/button';
-import { Dropdown } from '../app/components/elements/dropdown';
 import { RatingCard } from '../app/components/elements/rating-card';
 import { Layout } from '../app/components/layout';
-import { Modal } from '../app/components/modals/default';
+import { StartQuizModal } from '../app/components/modals/start-quiz';
 import { UserCard } from '../app/components/modules/user-card';
+import { useAppDispatch, useAppSelector } from '../app/store/hooks';
+import { toggleModal } from '../app/store/ui/slice';
+import { loadMe } from '../app/store/user/slice';
 
 const HomePage: NextPageWithLayout = () => {
-    /**
-     * Create select options 10, 15, 20, 25, 30
-     */
-    const amountOptions = useMemo(
-        () =>
-            Array.from(Array(35).keys())
-                .filter((k: number) => k % 5 === 0 && k >= 10)
-                .map((k) => ({ value: k })),
-        [],
-    );
+    const { userData } = useAppSelector((state) => state.user);
+    const { startModalOpen } = useAppSelector((state) => state.ui);
+    const dispatch = useAppDispatch();
+
     useEffect(() => {
-        const run = async () => {
-            const data = await questionService.read();
-            console.log(data);
-        };
-        run();
-    }, []);
+        if (!userData) {
+            dispatch(loadMe());
+        }
+    }, [dispatch, userData]);
 
     return (
         <div className="flex gap-5 flex-col md:flex-row">
-            <Modal
-                title="Configure your quiz"
-                acceptLabel="Go"
-                rejectLabel="Cancel"
-                onAccept={() => console.log('test')}
-                onReject={() => alert('test')}
-            >
-                <div className="flex-col flex sm:flex-row gap-2">
-                    <Dropdown
-                        label="Difficulty"
-                        options={[
-                            { name: 'Easy', value: 1 },
-                            { name: 'Medium', value: 2 },
-                        ]}
-                    />
-                    <Dropdown
-                        label="Genre"
-                        options={[
-                            { name: 'Math', value: 1 },
-                            { name: 'Chemistry', value: 2 },
-                        ]}
-                    />
-                    <Dropdown label="Amount" options={amountOptions} />
-                </div>
-            </Modal>
+            <StartQuizModal open={startModalOpen} onClose={() => dispatch(toggleModal('startModal'))} />
             <div className="w-100 xs:w-100 sm:w-100 md:w-1/2 lg:w-1/2 xl:w-2/3 flex flex-col items-center">
                 <UserCard />
-                <Button className="bg-red-800 shadow-xl px-8 py-5">START NEW QUIZ</Button>
+                <Button className="bg-red-800 shadow-xl px-8 py-5" onClick={() => dispatch(toggleModal('startModal'))}>
+                    START NEW QUIZ
+                </Button>
             </div>
             <div className="p-2 grow">
                 <div className="text-center text-2xl text-gray-600 my-5">Global rating</div>

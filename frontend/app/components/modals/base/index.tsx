@@ -2,6 +2,8 @@ import { Dialog, Transition } from '@headlessui/react';
 import { FC, Fragment, useRef, useState } from 'react';
 
 interface Props {
+    open: boolean;
+    onClose: () => void;
     title: string | React.ReactNode;
     acceptLabel: string;
     rejectLabel: string;
@@ -9,12 +11,20 @@ interface Props {
     onReject: () => void;
 }
 
-export const Modal: FC<Props> = ({ children, title, acceptLabel, rejectLabel, onAccept, onReject }) => {
-    const [open, setOpen] = useState(true);
+export const BaseModal: FC<Props> = ({
+    open = false,
+    onClose,
+    children,
+    title,
+    acceptLabel,
+    rejectLabel,
+    onAccept,
+    onReject,
+}) => {
     const cancelButtonRef = useRef(null);
 
     const handleActionClick = (fn: () => void) => {
-        setOpen(false);
+        onClose();
         fn();
     };
 
@@ -24,7 +34,7 @@ export const Modal: FC<Props> = ({ children, title, acceptLabel, rejectLabel, on
                 as="div"
                 className="fixed z-10 inset-0 overflow-y-auto"
                 initialFocus={cancelButtonRef}
-                onClose={setOpen}
+                onClose={onClose}
             >
                 <div className="flex items-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                     <Transition.Child
@@ -69,7 +79,7 @@ export const Modal: FC<Props> = ({ children, title, acceptLabel, rejectLabel, on
                                 <button
                                     type="button"
                                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-                                    onClick={() => handleActionClick(onAccept)}
+                                    onClick={onAccept}
                                 >
                                     {acceptLabel}
                                 </button>

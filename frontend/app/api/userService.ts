@@ -7,11 +7,14 @@ class UserService extends ApiService {
     }
 
     register({ email, name, password }: RegisterPayload) {
-        return this.post<RegisterPayload>('/sign-up', { email, name, password });
+        return this.post<any, RegisterPayload>('/sign-up', { email, name, password });
     }
 
     login({ email, password }: LoginPayload) {
-        return this.post<LoginPayload>('/sign-in', { email, password });
+        return this.post<any, LoginPayload>('/sign-in', { email, password });
+    }
+    loadMe() {
+        return this.get('/me');
     }
 }
 
