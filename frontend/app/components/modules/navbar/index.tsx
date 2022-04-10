@@ -1,11 +1,23 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { FC } from 'react';
-import { useAppSelector } from '../../../store/hooks';
+import { STORAGE_KEYS } from '../../../constants/storage-keys';
+import { logout } from '../../../store/auth/slice';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { LocalStorage } from '../../../utils/local-storage';
 import { Container } from '../../container';
 import { Button } from '../../elements/button';
 
 export const Navbar: FC = () => {
     const { authenticated } = useAppSelector((state) => state.auth);
+    const router = useRouter();
+    const dispatch = useAppDispatch();
+
+    const onLogout = () => {
+        LocalStorage.delete(STORAGE_KEYS.accessToken);
+        router.push('/auth/sign-in');
+        dispatch(logout());
+    };
     const unauthorizedNavbar = (
         <>
             <Link href="/auth/sign-in" passHref>
@@ -16,7 +28,11 @@ export const Navbar: FC = () => {
             </Link>
         </>
     );
-    const authorizedNavbar = <Button className="bg-red-500 hover:bg-red-700 py-1 px-2">Sign Out</Button>;
+    const authorizedNavbar = (
+        <Button className="bg-red-500 hover:bg-red-700 py-1 px-2" onClick={onLogout}>
+            Sign Out
+        </Button>
+    );
     return (
         <div className="bg-gray-50 shadow-sm">
             <Container>

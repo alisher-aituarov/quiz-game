@@ -1,5 +1,4 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
@@ -8,14 +7,24 @@ import { genreRouter } from './src/routes/genre';
 import { questionRouter } from './src/routes/question';
 import { userRouter } from './src/routes/user';
 import { quizRouter } from './src/routes/quiz';
+import fileUpload from 'express-fileupload';
+import path from 'path';
 
-const prisma = new PrismaClient();
 const app = express();
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
+app.use(
+	fileUpload({
+		createParentPath: true,
+		limits: {
+			fileSize: 1024 * 1024 * 1024, //1 MB max file(s) size
+		},
+	})
+);
+app.use('/uploads', express.static(process.cwd() + '/uploads'));
 
 app.use('/users', userRouter);
 app.use('/difficulties', difficultyRouter);

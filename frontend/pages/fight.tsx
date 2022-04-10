@@ -11,6 +11,7 @@ import { getCurrentQuestion, skipQuestion, verifyAnswer } from '../app/store/que
 const FightPage: NextPageWithLayout = () => {
     const [chosenAnswer, setChosenAnswer] = useState<number | null>(null);
     const { currentQuestion, loading, error } = useAppSelector((state) => state.question);
+    const { running, quiz } = useAppSelector((state) => state.quiz);
     const dispatch = useAppDispatch();
 
     useEffect(() => void dispatch(getCurrentQuestion()), []);
@@ -22,11 +23,24 @@ const FightPage: NextPageWithLayout = () => {
         dispatch(verifyAnswer({ questionId: currentQuestion.id, answerId: chosenAnswer }));
     };
 
-    if (loading && !currentQuestion) {
+    if (loading && !currentQuestion && !quiz) {
         return (
             <div className="flex h-full w-100 justify-center items-center">
                 <div className="w-full sm:w-full md:w-2/3 lg:w-2/3 xl:w-2/5 bg-white shadow-xl rounded-lg flex flex-col">
                     Loading
+                </div>
+            </div>
+        );
+    }
+
+    if (!running) {
+        return (
+            <div className="flex h-full w-100 justify-center items-center">
+                <div className="w-full sm:w-full md:w-2/3 lg:w-2/3 xl:w-2/5 bg-white shadow-xl rounded-lg flex flex-col">
+                    <div className="w-full h-16 bg-red-500 rounded-t-lg relative overflow-hidden flex justify-center items-center">
+                        <div className="text-white text-xl">You have finished your quiz!</div>
+                    </div>
+                    <div className="text-xl text-center py-4">Points earned: {quiz?.points}</div>
                 </div>
             </div>
         );
@@ -55,8 +69,12 @@ const FightPage: NextPageWithLayout = () => {
                         />
                     ))}
                     <div className="flex gap-2 mt-5 justify-end">
-                        <Tooltip content="Skipping costs 1 point">
-                            <Button className="bg-red-500 hover:bg-red-700" onClick={() => dispatch(skipQuestion())}>
+                        <Tooltip content={currentQuestion?.checked ? 'You can not skip' : 'Skipping costs 1 point'}>
+                            <Button
+                                className="bg-red-500 hover:bg-red-700"
+                                onClick={() => dispatch(skipQuestion())}
+                                disabled={currentQuestion?.checked}
+                            >
                                 Skip
                             </Button>
                         </Tooltip>
@@ -84,7 +102,7 @@ const FightPage: NextPageWithLayout = () => {
     );
 };
 
-FightPage.getLayout = function (page: ReactElement) {
+FightPage.getLayout = function getLayout(page: ReactElement) {
     return <Layout>{page}</Layout>;
 };
 

@@ -12,6 +12,9 @@ export interface UserState {
     userData: User | null;
     loading: boolean;
     error: string;
+    globalRating: Omit<User, 'role'>[];
+    loadingRating: boolean;
+    loadingRatingError: '';
 }
 
 export interface UIState {
@@ -19,7 +22,8 @@ export interface UIState {
 }
 
 export interface QuizState {
-    runningQuiz: Quiz | null;
+    quiz: Quiz | null;
+    running: boolean;
     loading: boolean;
     error: string;
 }

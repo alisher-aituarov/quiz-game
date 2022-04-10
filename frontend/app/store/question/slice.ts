@@ -42,7 +42,7 @@ const questionSlice = createSlice({
             state.verifying = false;
             state.error = payload;
         },
-        skipQuestion: (state, { payload }: PayloadAction<SkipQuestionPayload>) => {
+        skipQuestion: (state) => {
             state.loading = true;
             state.error = '';
         },

@@ -4,7 +4,7 @@ import { LocalStorage } from '../utils/local-storage';
 
 export const httpClient = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BASE_API_URL,
-    timeout: 2000,
+    timeout: 10000,
     headers: { 'Content-Type': 'application/json' },
 });
 
@@ -26,6 +26,7 @@ httpClient.interceptors.response.use(
         return { data: response.data.data, error: undefined };
     },
     (error) => {
+        console.log(error);
         return Promise.reject({ message: error.response.data.error });
     },
 );

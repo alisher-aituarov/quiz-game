@@ -4,6 +4,7 @@ import { protect } from '../middleware/auth';
 import { SignInPayload, SignUpPayload } from '../types/User';
 import { generateToken } from '../utils/security';
 
+const fs = require('fs');
 const bcrypt = require('bcrypt');
 const express = require('express');
 const { body, validationResult } = require('express-validator');
@@ -24,7 +25,6 @@ router.post(
 	async (req: Request & { body: SignUpPayload }, res: Response) => {
 		const { body } = req;
 		const errors = validationResult(req);
-		console.log(errors.array());
 
 		if (!errors.isEmpty()) {
 			return res.status(400).send({
@@ -109,5 +109,77 @@ router.get(
 		}
 	}
 );
+
+router.post(
+	'/upload-avatar',
+	protect,
+	async (
+		req: Request & { files: any; user: { id: number } },
+		res: Response
+	) => {
+		const dir = './uploads';
+		try {
+			if (!fs.existsSync(dir)) {
+				fs.mkdirSync(dir);
+			}
+			const avatar = req.files.avatar;
+			if (!avatar) {
+				res.status(400).json({
+					error: 'No file found',
+				});
+			}
+
+			const avatarPath =
+				dir +
+				'/' +
+				Math.ceil(Math.random() * 1000) +
+				avatar.name.split(' ').join('_');
+
+			avatar.mv(avatarPath);
+
+			await prisma.user.update({
+				where: {
+					id: req.user.id,
+				},
+				data: {
+					avatar: avatarPath.slice(1),
+				},
+			});
+
+			return res.send({
+				data: 'Picture saved',
+			});
+		} catch (error) {
+			return res.status(500).json({
+				error: error.message,
+			});
+		}
+	}
+);
+
+router.get('/rating-global', async (req: Request, res: Response) => {
+	try {
+		const users = await prisma.user.findMany({
+			orderBy: {
+				score: 'desc',
+			},
+			take: 10,
+			select: {
+				id: true,
+				avatar: true,
+				name: true,
+				score: true,
+				email: true,
+			},
+		});
+		return res.json({
+			data: users,
+		});
+	} catch ({ message }) {
+		return res.status(500).json({
+			error: message,
+		});
+	}
+});
 
 export const userRouter = router;

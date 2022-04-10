@@ -8,7 +8,7 @@ class QuizService extends ApiService {
     start(args: StartQuizPayload): Promise<any> {
         return this.post<Quiz, any>('/start', args);
     }
-    getCurrent(): Promise<any> {
+    getCurrentQuestion(): Promise<any> {
         return this.get<Question>('/current');
     }
     verify(args: VerifyAnswerPayload): Promise<any> {
@@ -16,6 +16,9 @@ class QuizService extends ApiService {
     }
     skip(id: number): Promise<any> {
         return this.post(`/skip/${id}`);
+    }
+    getCurrentQuiz(): Promise<any> {
+        return this.get('/running');
     }
 }
 

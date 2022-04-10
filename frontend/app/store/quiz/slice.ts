@@ -3,7 +3,8 @@ import { StartQuizPayload } from '../../types';
 import { QuizState } from '../types';
 
 export const initialState: QuizState = {
-    runningQuiz: null,
+    quiz: null,
+    running: false,
     loading: false,
     error: '',
 };
@@ -19,15 +20,35 @@ const quizSlice = createSlice({
         startQuizSuccess: (state, { payload }: PayloadAction<Quiz>) => {
             state.loading = false;
             state.error = '';
-            state.runningQuiz = payload;
+            state.quiz = payload;
+            state.running = true;
         },
         startQuizError: (state, { payload }) => {
             state.loading = false;
             state.error = payload as string;
         },
+        fetchQuiz: (state) => {
+            state.loading = true;
+            state.error = '';
+        },
+        fetchQuizSuccess: (state, { payload }: PayloadAction<Quiz>) => {
+            state.loading = false;
+            state.error = '';
+            state.quiz = payload;
+            state.running = !payload.endTime;
+        },
+        fetchQuizError: (state, { payload }) => {
+            state.loading = false;
+            state.error = payload as string;
+        },
+        finishQuiz: (state, { payload }: PayloadAction<Quiz>) => {
+            state.running = false;
+            state.quiz = payload;
+        },
     },
 });
 
-export const { startQuiz, startQuizSuccess, startQuizError } = quizSlice.actions;
+export const { startQuiz, startQuizSuccess, startQuizError, fetchQuiz, fetchQuizError, fetchQuizSuccess, finishQuiz } =
+    quizSlice.actions;
 
 export default quizSlice.reducer;

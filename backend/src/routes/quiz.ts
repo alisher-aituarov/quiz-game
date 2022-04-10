@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { Request, Response } from 'express';
+import e, { Request, Response } from 'express';
 import { protect } from '../middleware/auth';
 
 const express = require('express');
@@ -59,6 +59,32 @@ router.post(
 );
 
 router.get(
+	'/running',
+	protect,
+	async (req: Request & { user: { id: number } }, res: Response) => {
+		const { user } = req;
+		try {
+			const quiz = await prisma.quiz.findFirst({
+				where: {
+					userId: user.id,
+				},
+				orderBy: {
+					startTime: 'desc',
+				},
+			});
+			return res.json({
+				success: true,
+				data: quiz,
+			});
+		} catch ({ message }) {
+			return res.status(500).json({
+				error: message,
+			});
+		}
+	}
+);
+
+router.get(
 	'/current',
 	protect,
 	async (
@@ -76,8 +102,11 @@ router.get(
 				},
 			});
 			if (!quiz.questions.length) {
-				return res.status(404).json({
+				return res.status(200).json({
 					message: 'You have finished quiz!',
+					data: {
+						quiz,
+					},
 				});
 			}
 			const question = await prisma.question.findUnique({
@@ -111,7 +140,9 @@ router.post(
 	'/verify/:id',
 	protect,
 	async (
-		req: Request & { user: { id: number; seenQuestions: number[] } },
+		req: Request & {
+			user: { id: number; seenQuestions: number[]; score: number };
+		},
 		res: Response
 	) => {
 		const questionID = +req.params.id;
@@ -155,21 +186,22 @@ router.post(
 						: quiz.points - question.pointPrice,
 				},
 			});
-			await prisma.user.update({
-				where: {
-					id: req.user.id,
-				},
-				data: {
-					seenQuestions: [...req.user.seenQuestions, question.id],
-				},
-			});
-			await prisma.quiz.update({
+			const updatedQuiz = await prisma.quiz.update({
 				where: {
 					id: quiz.id,
 				},
 				data: {
 					current: quiz.current + 1,
 					...(quiz.current + 1 === quiz.amount && { endTime: new Date() }),
+				},
+			});
+			await prisma.user.update({
+				where: {
+					id: req.user.id,
+				},
+				data: {
+					score: req.user.score + updatedQuiz.points,
+					seenQuestions: [...req.user.seenQuestions, question.id],
 				},
 			});
 			return res.json({
@@ -255,7 +287,7 @@ router.post(
 					error: 'You have already answered to that question',
 				});
 			}
-			await prisma.quiz.update({
+			const updatedQuiz = await prisma.quiz.update({
 				where: {
 					id: quiz.id,
 				},
@@ -271,6 +303,7 @@ router.post(
 					id: req.user.id,
 				},
 				data: {
+					score: req.user.score + updatedQuiz.points,
 					seenQuestions: [...req.user.seenQuestions, question.id],
 				},
 			});

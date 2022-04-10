@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "bin/index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,8 +17,12 @@
     "cors": "^2.8.5",
     "esm": "^3.2.25",
     "express": "^4.17.2",
+    "express-fileupload": "^1.3.1",
     "express-validator": "^6.14.0",
     "jsonwebtoken": "^8.5.1"
+  },
+  "bin":{
+    "import_questions": "./bin/index.js"
   },
   "devDependencies": {
     "@babel/core": "^7.17.0",

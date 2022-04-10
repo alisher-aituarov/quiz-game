@@ -13,8 +13,17 @@ class UserService extends ApiService {
     login({ email, password }: LoginPayload) {
         return this.post<any, LoginPayload>('/sign-in', { email, password });
     }
+
     loadMe() {
         return this.get('/me');
+    }
+
+    getGlobalRating() {
+        return this.get('/rating-global');
+    }
+
+    uploadAvatar(data: FormData) {
+        return this.post('/upload-avatar', data);
     }
 }
 

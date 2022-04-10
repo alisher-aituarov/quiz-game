@@ -5,6 +5,9 @@ export const initialState: UserState = {
     userData: null,
     error: '',
     loading: false,
+    globalRating: [],
+    loadingRating: false,
+    loadingRatingError: '',
 };
 
 const userSlice = createSlice({
@@ -24,9 +27,23 @@ const userSlice = createSlice({
             state.loading = false;
             state.error = payload;
         },
+        loadGlobalRating: (state) => {
+            state.loadingRating = true;
+            state.loadingRatingError = '';
+        },
+        loadGlobalRatingSuccess: (state, { payload }) => {
+            state.loadingRating = false;
+            state.loadingRatingError = '';
+            state.globalRating = payload;
+        },
+        loadGlobalRatingError: (state, { payload }) => {
+            state.loadingRating = false;
+            state.loadingRatingError = payload;
+        },
     },
 });
 
-export const { loadMe, loadMeSuccess, loadMeError } = userSlice.actions;
+export const { loadMe, loadMeSuccess, loadMeError, loadGlobalRating, loadGlobalRatingError, loadGlobalRatingSuccess } =
+    userSlice.actions;
 
 export default userSlice.reducer;
