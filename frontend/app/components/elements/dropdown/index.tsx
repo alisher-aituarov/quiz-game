@@ -1,11 +1,19 @@
-import React, { FC, Fragment } from 'react';
+import React, { FC, Fragment, useEffect, useState } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import classNames from 'classnames';
+import { Spinner } from '../spinner';
 
+/**
+ * Fixme make options and asyncFetcher optional
+ */
 interface Props {
     label: string;
-    options: TOption[];
+    options?: TOption[];
     primary?: boolean;
+    name: string;
+    value: number | null;
+    onChange: ({ value, name }: { value: number; name: string }) => void;
+    asyncFetcher?: () => Promise<TOption[]>;
 }
 
 export type TOption = {
@@ -13,7 +21,41 @@ export type TOption = {
     value: number;
 };
 
-export const Dropdown: FC<Props> = ({ label, options, primary }) => {
+export const Dropdown: FC<Props> = ({
+    label,
+    name: dropdownName,
+    onChange,
+    options: optionsProp,
+    primary,
+    asyncFetcher,
+    value,
+}) => {
+    const [options, setOptions] = useState(optionsProp);
+    const [selected, setSelected] = useState<TOption | null>(null);
+    const [fetching, setFetching] = useState(false);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        if (value) setSelected(options?.find((o) => o.value === value) || null);
+    }, [value, options]);
+
+    useEffect(() => {
+        (async function () {
+            if (asyncFetcher) {
+                try {
+                    setFetching(true);
+                    const data = await asyncFetcher();
+                    setOptions(data);
+                    console.log(data);
+                } catch (error) {
+                    setError('Could not load options');
+                } finally {
+                    setFetching(false);
+                }
+            }
+        })();
+    }, []);
+
     return (
         <Menu as="div" className={classNames('relative inline-block text-left', { 'w-full h-full': primary })}>
             <Menu.Button
@@ -25,7 +67,7 @@ export const Dropdown: FC<Props> = ({ label, options, primary }) => {
                     },
                 )}
             >
-                {label}
+                {selected?.name || label}
             </Menu.Button>
 
             <Transition
@@ -39,8 +81,8 @@ export const Dropdown: FC<Props> = ({ label, options, primary }) => {
             >
                 <Menu.Items className="origin-top-right z-30 absolute right-1/2 translate-x-2/4 mt-2 w-full md:w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
-                        {options.map(({ name, value }) => (
-                            <Menu.Item key={value}>
+                        {options?.map(({ name, value }) => (
+                            <Menu.Item key={value} onClick={() => onChange({ name: dropdownName, value })}>
                                 {({ active }) => (
                                     <span
                                         className={classNames(
@@ -53,9 +95,19 @@ export const Dropdown: FC<Props> = ({ label, options, primary }) => {
                                 )}
                             </Menu.Item>
                         ))}
-                        {!options?.length && (
+                        {!options?.length && !asyncFetcher && (
                             <Menu.Item>
                                 <span className={classNames('block px-4 py-2 text-sm')}>Empty</span>
+                            </Menu.Item>
+                        )}
+                        {!options?.length && asyncFetcher && fetching && (
+                            <Menu.Item>
+                                <Spinner />
+                            </Menu.Item>
+                        )}
+                        {error && (
+                            <Menu.Item>
+                                <div>{error}</div>
                             </Menu.Item>
                         )}
                     </div>
